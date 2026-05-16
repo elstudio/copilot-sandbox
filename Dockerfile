@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git curl wget ca-certificates openssh-server \
     ripgrep fd-find sudo locales \
     gnome-keyring dbus-x11 libsecret-1-0 \
+    vim-tiny \
     && rm -rf /var/lib/apt/lists/*
 
 # Fix locale (prevents weird terminal issues)
@@ -28,15 +29,6 @@ RUN mkdir -p -m 755 /etc/apt/keyrings \
     && apt-get update && apt-get install -y gh \
     && rm -rf /var/lib/apt/lists/*
 
-# Neovim (architecture-aware)
-RUN ARCH=$(dpkg --print-architecture) && \
-    if [ "$ARCH" = "arm64" ]; then NVIM_ARCH="arm64"; \
-    else NVIM_ARCH="x86_64"; fi && \
-    curl -sL "https://github.com/neovim/neovim/releases/latest/download/nvim-linux-${NVIM_ARCH}.tar.gz" \
-    | tar xz -C /tmp && \
-    mv /tmp/nvim-linux-${NVIM_ARCH} /opt/nvim && \
-    ln -s /opt/nvim/bin/nvim /usr/local/bin/nvim
-
 # Copilot CLI
 RUN curl -fsSL https://gh.io/copilot-install | bash
 
@@ -50,11 +42,8 @@ RUN mkdir -p /run/sshd && \
 RUN useradd -m -s /bin/bash -G sudo dev && \
     echo "dev ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/dev
 
-# LazyVim config (as dev user)
-USER dev
-RUN git clone https://github.com/LazyVim/starter ~/.config/nvim
-
 # SSH authorized_keys directory
+USER dev
 RUN mkdir -p ~/.ssh && chmod 700 ~/.ssh
 
 USER root
