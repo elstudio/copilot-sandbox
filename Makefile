@@ -11,7 +11,7 @@ $(SSH_KEY):
 build: ## Build the container
 	container-compose build
 
-up: $(SSH_KEY) ## Build and start the container
+up: $(SSH_KEY) build ## Build and start the container
 	# Work around a bug https://github.com/Mcrich23/Container-Compose/issues/93
 	# container-compose up -d --build 
 	container run -d --rm --name copilot-cli -c 2 -m 2G -p 2222:22 --ssh -v ./.ssh/copilot-sandbox.pub:/tmp/authorized_keys:ro copilot-cli
