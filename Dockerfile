@@ -5,7 +5,8 @@ ARG TARGETARCH
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Core tools
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get upgrade -y 
+RUN apt-get install -y --no-install-recommends \
     git curl wget ca-certificates openssh-server \
     ripgrep fd-find sudo locales \
     gnome-keyring dbus-x11 libsecret-1-0 \
