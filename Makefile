@@ -8,18 +8,21 @@ $(SSH_KEY):
 	@ssh-keygen -t ed25519 -f $(SSH_KEY) -N "" -q
 	@echo "✓ SSH keypair generated at $(SSH_KEY)"
 
+start:
+	container start copilot-cli
+
 build: ## Build the container
-	container-compose build
+	container system start
+# 	container-compose build
 
 up: $(SSH_KEY) build ## Build and start the container
-	# Work around a bug https://github.com/Mcrich23/Container-Compose/issues/93
-	# container-compose up -d --build 
-	container run -d --name copilot-cli -c 2 -m 2G -p 2222:22 --ssh -v ./.ssh/copilot-sandbox.pub:/tmp/authorized_keys:ro -v ~/code/sandbox:/home/dev/code copilot-cli
+	container-compose up -d --build 
+# 	container run -d --name copilot-cli -c 2 -m 2G -p 2222:22 --ssh -v ./.ssh/copilot-sandbox.pub:/tmp/authorized_keys:ro -v ~/code/sandbox:/home/dev/code copilot-cli
 
 down: ## Stop and remove the container
 	container-compose down
 
-ssh: ## SSH into the container
+ssh: start ## SSH into the container
 	ssh -p 2222 -i $(SSH_KEY) -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null dev@localhost
 
 clean: down ## Remove container, image, and SSH keys

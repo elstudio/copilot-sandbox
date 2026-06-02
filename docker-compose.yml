@@ -3,6 +3,7 @@ services:
     build: .
     container_name: copilot-cli
     init: true
+    ssh: true
     ports:
       - "127.0.0.1:2222:22"
     memory:
