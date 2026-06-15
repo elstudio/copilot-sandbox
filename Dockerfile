@@ -30,9 +30,6 @@ RUN mkdir -p -m 755 /etc/apt/keyrings \
     && apt-get update && apt-get install -y gh \
     && rm -rf /var/lib/apt/lists/*
 
-# Copilot CLI
-RUN curl -fsSL https://gh.io/copilot-install | bash
-
 # Node.js (required for Codex CLI)
 RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key \
        | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
@@ -54,9 +51,10 @@ RUN mkdir -p /run/sshd && \
 RUN useradd -m -s /bin/bash -G sudo dev && \
     echo "dev ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/dev
 
-# SSH authorized_keys directory
+# SSH authorized_keys directory + Copilot CLI extension (gh extensions are per-user)
 USER dev
-RUN mkdir -p ~/.ssh && chmod 700 ~/.ssh && mkdir ~/code
+RUN mkdir -p ~/.ssh && chmod 700 ~/.ssh && mkdir ~/code \
+    && gh extension install github/gh-copilot
 
 USER root
 
