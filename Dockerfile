@@ -1,3 +1,5 @@
+FROM node:22-slim AS node
+
 FROM ubuntu:24.04
 
 ARG TARGETARCH
@@ -5,7 +7,7 @@ ARG TARGETARCH
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Core tools
-RUN apt-get update && apt-get upgrade -y 
+RUN apt-get update && apt-get upgrade -y
 RUN apt-get install -y --no-install-recommends \
     git curl wget ca-certificates openssh-server \
     ripgrep fd-find sudo locales \
@@ -20,6 +22,12 @@ ENV LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
 # fd-find installs as fdfind on Ubuntu
 RUN ln -s $(which fdfind) /usr/local/bin/fd
 
+# Node.js (copied from official node image)
+COPY --from=node /usr/local/bin/node /usr/local/bin/node
+COPY --from=node /usr/local/bin/npm /usr/local/bin/npm
+COPY --from=node /usr/local/bin/npx /usr/local/bin/npx
+COPY --from=node /usr/local/lib/node_modules /usr/local/lib/node_modules
+
 # GitHub CLI
 RUN mkdir -p -m 755 /etc/apt/keyrings \
     && wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg \
@@ -30,8 +38,8 @@ RUN mkdir -p -m 755 /etc/apt/keyrings \
     && apt-get update && apt-get install -y gh \
     && rm -rf /var/lib/apt/lists/*
 
-# Copilot CLI
-RUN curl -fsSL https://gh.io/copilot-install | bash
+# Codex CLI
+RUN npm install -g @openai/codex
 
 # SSH server setup (key-based auth only)
 RUN mkdir -p /run/sshd && \
@@ -43,9 +51,10 @@ RUN mkdir -p /run/sshd && \
 RUN useradd -m -s /bin/bash -G sudo dev && \
     echo "dev ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/dev
 
-# SSH authorized_keys directory
+# SSH authorized_keys directory + Copilot CLI extension (gh extensions are per-user)
 USER dev
-RUN mkdir -p ~/.ssh && chmod 700 ~/.ssh && mkdir ~/code
+RUN mkdir -p ~/.ssh && chmod 700 ~/.ssh && mkdir ~/code \
+    && gh extension install github/gh-copilot
 
 USER root
 
