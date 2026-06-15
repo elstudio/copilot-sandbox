@@ -3,9 +3,12 @@ services:
     build:
       context: .
       args:
-        HTTP_PROXY: ""
-        HTTPS_PROXY: ""
-        NO_PROXY: "localhost,127.0.0.1"
+        HTTP_PROXY: 
+          ""
+        HTTPS_PROXY: 
+          ""
+        NO_PROXY: 
+          "localhost,127.0.0.1"
     container_name: copilot-cli
     init: true
     ssh: true
