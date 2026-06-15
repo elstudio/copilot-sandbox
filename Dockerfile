@@ -33,6 +33,14 @@ RUN mkdir -p -m 755 /etc/apt/keyrings \
 # Copilot CLI
 RUN curl -fsSL https://gh.io/copilot-install | bash
 
+# Node.js (required for Codex CLI)
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
+# Codex CLI
+RUN npm install -g @openai/codex
+
 # SSH server setup (key-based auth only)
 RUN mkdir -p /run/sshd && \
     sed -i 's/#PermitRootLogin .*/PermitRootLogin no/' /etc/ssh/sshd_config && \
