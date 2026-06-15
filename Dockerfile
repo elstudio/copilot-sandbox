@@ -31,9 +31,9 @@ RUN ln -s $(which fdfind) /usr/local/bin/fd
 
 # Node.js (copied from official node image)
 COPY --from=node /usr/local/bin/node /usr/local/bin/node
-COPY --from=node /usr/local/bin/npm /usr/local/bin/npm
-COPY --from=node /usr/local/bin/npx /usr/local/bin/npx
 COPY --from=node /usr/local/lib/node_modules /usr/local/lib/node_modules
+RUN ln -sf /usr/local/lib/node_modules/npm/bin/npm /usr/local/bin/npm \
+    && ln -sf /usr/local/lib/node_modules/npm/bin/npx /usr/local/bin/npx
 
 # GitHub CLI (copied from official gh image)
 COPY --from=gh-cli /usr/local/bin/gh /usr/local/bin/gh
