@@ -1,3 +1,4 @@
+name: copilot-sandbox
 services:
   copilot-cli:
     build:
@@ -6,9 +7,10 @@ services:
         HTTP_PROXY: ""
         HTTPS_PROXY: ""
         NO_PROXY: "localhost,127.0.0.1"
+      ssh: 
+        - default
     container_name: copilot-cli
     init: true
-    ssh: true
     ports:
       - "127.0.0.1:2222:22"
     deploy:
