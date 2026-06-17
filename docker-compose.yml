@@ -18,9 +18,9 @@ services:
         limits:
           memory: 2g
           cpus: 2
-      reservations:
-        memory: 512m
-        cpus: '0.5'
+        reservations:
+          memory: 512m
+          cpus: '0.5'
     volumes:
       # Mount the auto-generated SSH public key for auth
       - ./.ssh/copilot-sandbox.pub:/tmp/authorized_keys:ro
