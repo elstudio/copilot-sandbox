@@ -24,4 +24,4 @@ services:
     volumes:
       # Mount the auto-generated SSH public key for auth
       - ./.ssh/copilot-sandbox.pub:/tmp/authorized_keys:ro
-      - {$HOME}/code/sandbox:/home/dev/code
+      - ~/code/sandbox:/home/dev/code
