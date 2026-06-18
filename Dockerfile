@@ -45,8 +45,8 @@ RUN mkdir -p -m 755 /etc/apt/keyrings \
     && apt-get update && apt-get install -y gh \
     && rm -rf /var/lib/apt/lists/*
 
-# Codex CLI
-RUN npm install -g @openai/codex
+# Codex CLI + Claude Code
+RUN npm install -g @openai/codex @anthropic-ai/claude-code
 
 # SSH server setup (key-based auth only)
 RUN mkdir -p /run/sshd && \
