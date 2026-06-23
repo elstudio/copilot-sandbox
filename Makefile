@@ -1,7 +1,13 @@
 SSH_KEY_DIR := .ssh
 SSH_KEY     := $(SSH_KEY_DIR)/copilot-sandbox
 
-.PHONY: build up down ssh clean help
+# DNS server the image builder uses to resolve package mirrors during `build`.
+# Apple's `container` builder gets no DNS by default, so apt-get update fails
+# with "Temporary failure resolving 'ports.ubuntu.com'". Override if 1.1.1.1
+# is blocked on your network, e.g. `make build BUILDER_DNS=8.8.8.8`.
+BUILDER_DNS ?= 1.1.1.1
+
+.PHONY: build builder up down ssh clean help
 
 $(SSH_KEY):
 	@mkdir -p $(SSH_KEY_DIR)
@@ -11,8 +17,12 @@ $(SSH_KEY):
 start:
 	container start copilot-cli
 
-build: ## Build the container
+builder: ## (Re)start the image builder with a working DNS server
 	container system start
+	container builder stop
+	container builder start --dns $(BUILDER_DNS)
+
+build: builder ## Build the container
 	container-compose build
 
 up: $(SSH_KEY) build ## Build and start the container

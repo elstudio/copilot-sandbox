@@ -37,6 +37,7 @@ copilot
 
 ```
 make build   Build the container
+make builder (Re)start the image builder with a working DNS server
 make up      Build and start the container
 make down    Stop and remove the container
 make ssh     SSH into the container
@@ -75,6 +76,31 @@ git config --global --list | grep cred
 ```
 
 Your fine-grained PAT also needs access to the private repos you're adding as marketplaces.
+
+## Troubleshooting
+
+### `make build` fails with `Temporary failure resolving 'ports.ubuntu.com'`
+
+Apple's `container` image builder starts **without a DNS server**, so `apt-get update`
+inside the build can't resolve package mirrors. Every package then fails with
+`Unable to locate package ...`.
+
+`make build` now fixes this automatically by (re)starting the builder with DNS before
+building. If your network blocks `1.1.1.1`, point it at another resolver:
+
+```bash
+make build BUILDER_DNS=8.8.8.8
+```
+
+To reset the builder manually:
+
+```bash
+container builder stop
+container builder start --dns 1.1.1.1
+```
+
+> Note: passing `--dns` to `container build` directly does **not** work — the RUN steps
+> ignore it. The DNS server must be set when the **builder** is started.
 
 ## Notes
 

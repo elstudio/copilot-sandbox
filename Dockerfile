@@ -13,8 +13,8 @@ ENV DEBIAN_FRONTEND=noninteractive \
     NO_PROXY=${NO_PROXY}
 
 # Core tools
-RUN apt-get update && apt-get upgrade -y
-RUN apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get upgrade -y \
+    && apt-get install -y --no-install-recommends \
     git curl ca-certificates openssh-server \
     ripgrep fd-find sudo locales \
     gnome-keyring dbus-x11 libsecret-1-0 \
