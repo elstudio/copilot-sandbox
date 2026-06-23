@@ -11,6 +11,13 @@ services:
         - default
     container_name: copilot-cli
     init: true
+    # DNS for the running container. Keep in sync with the Makefile's
+    # BUILDER_DNS (default 1.1.1.1), which fixes DNS for the image *builder*.
+    # NOTE: the current `container-compose` does not yet honor this `dns:` key,
+    # so it has no effect today — it's standard Compose syntax kept here for
+    # documentation and forward-compatibility (real Docker / future tooling).
+    dns:
+      - 1.1.1.1
     ports:
       - "127.0.0.1:2222:22"
     deploy:

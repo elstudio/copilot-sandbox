@@ -102,6 +102,12 @@ container builder start --dns 1.1.1.1
 > Note: passing `--dns` to `container build` directly does **not** work — the RUN steps
 > ignore it. The DNS server must be set when the **builder** is started.
 
+The `dns:` entry in `docker-compose.yml` is the matching setting for the **running**
+container, but note the current `container-compose` does not yet honor it, so the
+running container's DNS isn't overridden today. It's kept as standard, forward-compatible
+Compose syntax. If a container needs working DNS at runtime now, start it with
+`container run --dns 1.1.1.1 ...`.
+
 ## Notes
 
 - SSH is bound to `127.0.0.1:2222` only (not exposed to network)

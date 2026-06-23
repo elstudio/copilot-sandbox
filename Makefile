@@ -26,11 +26,12 @@ build: builder ## Build the container
 	container-compose build
 
 up: $(SSH_KEY) build ## Build and start the container
-	container-compose up -d
-# 	container run -d --name copilot-cli -c 2 -m 2G -p 2222:22 --ssh -v ./.ssh/copilot-sandbox.pub:/tmp/authorized_keys:ro -v ~/code/sandbox:/home/dev/code copilot-cli
+# 	container-compose up -d
+	container run -d --name copilot-cli -c 2 -m 2G -p 2222:22 --ssh --dns $(BUILDER_DNS) -v ./.ssh/copilot-sandbox.pub:/tmp/authorized_keys:ro -v ~/code/sandbox:/home/dev/code copilot-cli
 
 down: ## Stop and remove the container
-	container-compose down
+# 	container-compose down
+	container stop copilot-cli
 
 ssh: start ## SSH into the container
 	ssh -p 2222 -i $(SSH_KEY) -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null dev@localhost
