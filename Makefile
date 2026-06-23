@@ -13,10 +13,10 @@ start:
 
 build: ## Build the container
 	container system start
-# 	container-compose build
+	container-compose build
 
 up: $(SSH_KEY) build ## Build and start the container
-	container-compose up -d --build 
+	container-compose up -d
 # 	container run -d --name copilot-cli -c 2 -m 2G -p 2222:22 --ssh -v ./.ssh/copilot-sandbox.pub:/tmp/authorized_keys:ro -v ~/code/sandbox:/home/dev/code copilot-cli
 
 down: ## Stop and remove the container
