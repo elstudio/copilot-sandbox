@@ -4,9 +4,8 @@ SSH_KEY     := $(SSH_KEY_DIR)/copilot-sandbox
 # DNS server the image builder uses to resolve package mirrors during `build`.
 # Apple's `container` builder gets no DNS by default, so apt-get update fails
 # with "Temporary failure resolving 'ports.ubuntu.com'". Override if 1.1.1.1
-# is blocked on your network, e.g. `make build BUILDER_DNS=8.8.8.8`.
-BUILDER_DNS ?= 192.168.4.1
-# BUILDER_DNS ?= 1.1.1.1
+# is blocked on your network, e.g. `make build BUILDER_DNS=192.168.4.1`.
+BUILDER_DNS ?= 1.1.1.1
 CONTAINER_NAME ?= copilot-cli
 
 .PHONY: start build builder up down stop ssh clean ls help
