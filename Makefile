@@ -18,17 +18,15 @@ $(SSH_KEY):
 start: ## Start an existing container
 	container start $(CONTAINER_NAME)
 
-builder: ## (Re)start the image builder with a working DNS server
+build: ## (Re)start the image builder with a working DNS server
 	container system start
 # 	container builder stop
 # 	container builder start --dns $(BUILDER_DNS)
-
-build: builder ## Build the container
 	container-compose build
 
 up: $(SSH_KEY) build ## Build and start the container
-	container-compose up -d
-# 	container run -d --name $(CONTAINER_NAME) -c 2 -m 2G -p 2222:22 --ssh --dns $(BUILDER_DNS) -v ./.ssh/copilot-sandbox.pub:/tmp/authorized_keys:ro -v ~/code/sandbox:/home/dev/code $(CONTAINER_NAME)
+# 	container-compose up -d
+	container run -d --name $(CONTAINER_NAME) -c 2 -m 2G -p 2222:22 --ssh --dns $(BUILDER_DNS) -v ./.ssh/copilot-sandbox.pub:/tmp/authorized_keys:ro -v ~/code/sandbox:/home/dev/code $(CONTAINER_NAME)
 
 down:  ## Stop and remove the container
 	container-compose down
