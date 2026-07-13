@@ -28,13 +28,13 @@ up: $(SSH_KEY) build ## Build and start the container
 # 	container-compose up -d
 	container run -d --name $(CONTAINER_NAME) -c 2 -m 2G -p 2222:22 --ssh --dns $(BUILDER_DNS) -v ./.ssh/copilot-sandbox.pub:/tmp/authorized_keys:ro -v ~/code/sandbox:/home/dev/code $(CONTAINER_NAME)
 
-down:  ## Stop and remove the container
+down: ## Stop and remove the container
 	container-compose down
 	
-stop:  ## Stop the container, saving state
+stop: ## Stop the container, saving state
 	container stop $(CONTAINER_NAME)
 
-ssh:  ## SSH into the container
+ssh: ## SSH into the container
 	ssh -p 2222 -i $(SSH_KEY) -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null dev@localhost
 
 clean: down ## Remove container, image, and SSH keys
