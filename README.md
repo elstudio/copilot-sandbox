@@ -36,12 +36,13 @@ copilot
 ## Commands
 
 ```
-make build   Build the container
-make builder (Re)start the image builder with a working DNS server
-make up      Build and start the container
-make down    Stop and remove the container
+make build   Build the sandbox + proxy images
+make up      Build and start the sandbox behind an egress-allowlisting proxy
+make down    Stop and remove the container and proxy sidecar
+make stop    Stop the container and proxy, saving state
+make start   Start the existing container and its proxy sidecar
 make ssh     SSH into the container
-make clean   Remove container, image, and SSH keys
+make clean   Remove containers, the internal network, and SSH keys
 make help    Show all commands
 ```
 
@@ -108,9 +109,38 @@ running container's DNS isn't overridden today. It's kept as standard, forward-c
 Compose syntax. If a container needs working DNS at runtime now, start it with
 `container run --dns 1.1.1.1 ...`.
 
+## Network isolation
+
+`copilot-cli` has no direct route to the internet. It sits on an internal,
+no-NAT network (`sandbox-internal`) alongside a `copilot-proxy` sidecar,
+which is the only way out — and it only permits HTTPS `CONNECT` to
+allowlisted domains (github.com, `*.githubcopilot.com`, npm, Ubuntu
+mirrors, etc). Anything else — a compromised dependency trying to exfiltrate
+data, a stray `curl` to an unexpected host — gets a `403` from the proxy
+instead of a connection.
+
+```
+┌──────────────┐   sandbox-internal    ┌───────────────┐   default (NAT)    ┌──────────┐
+│ copilot-cli  │ ── (no direct route) ─│ copilot-proxy │ ──────────────────▶│ internet │
+└──────────────┘                       └───────────────┘                    └──────────┘
+```
+
+To allow another destination, add a line to
+[`proxy/allowlist.conf`](proxy/allowlist.conf) (one regex per line, matched
+against the request hostname) and `make build && make down && make up`.
+
+The proxy's IP isn't stable across `container stop`/`start` (Apple's
+`container` runtime has no static-IP option), so `make start` re-resolves it
+into `.runtime/proxy-ip`, a file bind-mounted into `copilot-cli` — no need
+to recreate the container to pick up a change.
+
+To go fully offline instead of allowlisting, drop the `--network default`
+leg from the `copilot-proxy` container in the Makefile's `up` target.
+
 ## Notes
 
 - SSH is bound to `127.0.0.1:2222` only (not exposed to network)
+- Outbound traffic from `copilot-cli` only reaches the destinations allowlisted in `proxy/allowlist.conf` — see [Network isolation](#network-isolation)
 - The `dev` user has passwordless sudo
 - Container runs with `init: true` for proper signal handling
 - `gh` tokens are stored in gnome-keyring (encrypted, in-memory) — not in plain text

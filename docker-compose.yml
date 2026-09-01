@@ -1,5 +1,11 @@
 name: copilot-sandbox
 services:
+  proxy:
+    build:
+      context: ./proxy
+    image: copilot-proxy
+    container_name: copilot-proxy
+
   copilot-cli:
     build:
       context: .
@@ -18,6 +24,12 @@ services:
     # documentation and forward-compatibility (real Docker / future tooling).
     dns:
       - 1.1.1.1
+    # Runtime networking (attaching to the internal, no-NAT network behind
+    # `proxy`, so only allowlisted domains are reachable) is orchestrated by
+    # the Makefile's `up` target via raw `container run`, not by this compose
+    # file — `container-compose` doesn't yet support the multi-network
+    # attachment this setup needs. This file is only used to build images
+    # (`make build` -> `container-compose build`). See `proxy/allowlist.conf`.
     ports:
       - "127.0.0.1:2222:22"
     deploy:
