@@ -14,6 +14,27 @@ if [ -f /tmp/authorized_keys ]; then
     echo "✓ SSH keys configured"
 fi
 
+# Wire up the egress-allowlisting proxy sidecar for SSH sessions. The
+# sidecar's IP isn't stable across `container stop`/`start` (Apple's
+# `container` runtime has no static-IP option), so the Makefile writes its
+# current address to a bind-mounted file on every start rather than baking
+# it into a container env var at creation time. sshd's PAM session doesn't
+# inherit the container process's environment either way, so this has to
+# land in /etc/environment for every login to pick it up. Re-derive it fresh
+# each boot (strip any stale lines first) since this runs on every
+# `container start`, not just the first `run`.
+PROXY_IP_FILE=/etc/copilot-sandbox/proxy-ip
+if [ -f "$PROXY_IP_FILE" ]; then
+    PROXY_IP=$(cat "$PROXY_IP_FILE")
+    PROXY_PORT=8888 # keep in sync with proxy/tinyproxy.conf's Port and the Makefile's PROXY_PORT
+    sed -i '/^\(HTTP_PROXY\|HTTPS_PROXY\|NO_PROXY\)=/d' /etc/environment
+    {
+        echo "HTTP_PROXY=http://$PROXY_IP:$PROXY_PORT"
+        echo "HTTPS_PROXY=http://$PROXY_IP:$PROXY_PORT"
+        echo "NO_PROXY=localhost,127.0.0.1"
+    } >> /etc/environment
+fi
+
 # Create keyring initialization script for SSH login sessions
 cat > /etc/profile.d/keyring.sh << 'KEYRING'
 if [ -z "$DBUS_SESSION_BUS_ADDRESS" ]; then
