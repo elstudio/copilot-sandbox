@@ -33,6 +33,15 @@ if [ -f "$PROXY_IP_FILE" ]; then
         echo "HTTPS_PROXY=http://$PROXY_IP:$PROXY_PORT"
         echo "NO_PROXY=localhost,127.0.0.1"
     } >> /etc/environment
+
+    # apt ignores HTTP_PROXY/HTTPS_PROXY entirely — it only honors its own
+    # Acquire::*::Proxy config — so without this, apt-get silently falls
+    # back to a direct connection that the internal network has no route
+    # for, and every source ends up "Ign"ored.
+    cat > /etc/apt/apt.conf.d/99proxy <<EOF
+Acquire::http::Proxy "http://$PROXY_IP:$PROXY_PORT";
+Acquire::https::Proxy "http://$PROXY_IP:$PROXY_PORT";
+EOF
 fi
 
 # Create keyring initialization script for SSH login sessions
