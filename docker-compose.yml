@@ -5,6 +5,15 @@ services:
       context: ./proxy
     image: copilot-proxy
     container_name: copilot-proxy
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+          cpus: 2
+        reservations:
+          memory: 512m
+          cpus: '0.5'
+          
 
   copilot-cli:
     build:
