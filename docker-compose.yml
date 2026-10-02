@@ -5,6 +5,8 @@ services:
       context: ./proxy
     image: copilot-proxy
     container_name: copilot-proxy
+    dns:
+      - 1.1.1.1
     deploy:
       resources:
         limits:
