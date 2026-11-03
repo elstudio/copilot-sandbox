@@ -28,13 +28,6 @@ ENV LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
 # fd-find installs as fdfind on Ubuntu
 RUN ln -s $(which fdfind) /usr/local/bin/fd
 
-# Node.js (copied from official node image)
-COPY --from=node /usr/local/bin/node /usr/local/bin/node
-COPY --from=node /usr/local/lib/node_modules /usr/local/lib/node_modules
-RUN ln -s /usr/local/lib/node_modules /usr/local/bin/node_modules \
-    && ln -sf /usr/local/lib/node_modules/npm/bin/npm /usr/local/bin/npm \
-    && ln -sf /usr/local/lib/node_modules/npm/bin/npx /usr/local/bin/npx
-
 # GitHub CLI
 RUN mkdir -p -m 755 /etc/apt/keyrings \
     && curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
@@ -45,8 +38,14 @@ RUN mkdir -p -m 755 /etc/apt/keyrings \
     && apt-get update && apt-get install -y gh \
     && rm -rf /var/lib/apt/lists/*
 
-# Codex CLI + Claude Code
-RUN npm install -g @openai/codex @anthropic-ai/claude-code
+# # Node.js (copied from official node image)
+# COPY --from=node /usr/local/bin/node /usr/local/bin/node
+# COPY --from=node /usr/local/lib/node_modules /usr/local/lib/node_modules
+# RUN ln -s /usr/local/lib/node_modules /usr/local/bin/node_modules \
+#     && ln -sf /usr/local/lib/node_modules/npm/bin/npm /usr/local/bin/npm \
+#     && ln -sf /usr/local/lib/node_modules/npm/bin/npx /usr/local/bin/npx
+# # Codex CLI + Claude Code
+# RUN npm install -g @openai/codex @anthropic-ai/claude-code
 
 # SSH server setup (key-based auth only)
 RUN mkdir -p /run/sshd && \
