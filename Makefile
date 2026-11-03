@@ -34,6 +34,8 @@ start: ## Start the existing container and its proxy sidecar
 
 build: ## (Re)start the image builder and build the sandbox + proxy images
 	container system start
+	-container builder stop
+	container builder start --dns $(BUILDER_DNS)
 	container-compose build
 
 network: ## Create the internal (no-internet) sandbox network, if missing
